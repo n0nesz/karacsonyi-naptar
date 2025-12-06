@@ -1,290 +1,143 @@
 <!DOCTYPE html>
 <html lang="hu">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karácsonyi Adventi Naptár</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>Adventi kalendárium</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #e8ecef;
+      /* világos szürke */
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    h1 {
+      text-align: center;
+      color: #2e7d32;
+      margin-bottom: 30px;
+    }
 
-        h1 {
-            color: #fff;
-            text-align: center;
-            margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            font-size: 2.5em;
-        }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-        .calendar-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-            max-width: 1200px;
-            width: 100%;
-            padding: 20px;
-        }
+    .day {
+      background: #2e7d32;
+      color: white;
+      border: 2px solid #1b5e20;
+      border-radius: 12px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: bold;
+      height: 90px;
+      width: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.3s;
+      box-sizing: border-box;
+      line-height: 1.1;
+    }
 
-        .day-box {
-            background: linear-gradient(145deg, #c41e3a, #a01729);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            position: relative;
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+    .day.opened {
+      background: white;
+      color: #2e7d32;
+      height: 120px !important;
+      width: 110px !important;
+    }
 
-        .day-box:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
-        }
+    .day.opened .emoji {
+      font-size: 26px;
+      margin-top: 4px;
+    }
 
-        .day-box.opened {
-            background: linear-gradient(145deg, #2d5016, #4a7c2c);
-        }
+    /* Hóesés animáció */
+    .snowflake {
+      position: absolute;
+      color: #fff;
+      font-size: 20px;
+      pointer-events: none;
+      animation: snowfall linear infinite;
+    }
 
-        .day-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
+    @keyframes snowfall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
 
-        .surprise {
-            display: none;
-            color: #fff;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-
-        .day-box.opened .surprise {
-            display: block;
-        }
-
-        .snowflake {
-            position: fixed;
-            top: -10px;
-            color: white;
-            font-size: 1em;
-            animation: fall linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: linear-gradient(145deg, #c41e3a, #a01729);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-            max-width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        .modal-content h2 {
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-
-        .modal-content p {
-            font-size: 1.2em;
-            line-height: 1.6;
-        }
-
-        .close-btn {
-            margin-top: 20px;
-            padding: 10px 30px;
-            background: white;
-            color: #c41e3a;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-        }
-
-        .close-btn:hover {
-            background: #f0f0f0;
-        }
-
-        .reset-btn {
-            margin: 20px;
-            padding: 12px 30px;
-            background: white;
-            color: #c41e3a;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-
-        .reset-btn:hover {
-            background: #f0f0f0;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.4);
-        }
-    </style>
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <h1>🎄 Adventi Naptár 🎄</h1>
-    
-    <button class="reset-btn" onclick="resetCalendar()">🔄 Naptár visszaállítása</button>
-    
-    <div class="calendar-container" id="calendar"></div>
+  <h1>🎄 Adventi kalendárium 🎄</h1>
+  <div class="calendar" id="calendar"></div>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2 id="modal-title"></h2>
-            <p id="modal-message"></p>
-            <button class="close-btn" onclick="closeModal()">Bezárás</button>
-        </div>
-    </div>
+  <script>
+    const calendar = document.getElementById("calendar");
+    let nextOpenableDay = 1;
+    const hetNapjai = ["Vasárnap", "Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat"];
 
-    <script>
-        // Meglepetések minden napra
-        const surprises = [
-            "☕ Egy meleg csokoládé vár rád!",
-            "🎵 Hallgass karácsonyi zenét!",
-            "🍪 Süss mézeskalácsot!",
-            "❄️ Készíts hóembert!",
-            "🎁 Gondolj valakire, akit szeretsz!",
-            "⭐ Nézd meg a csillagokat!",
-            "🕯️ Gyújts gyertyát!",
-            "📖 Olvass egy karácsonyi mesét!",
-            "🎨 Rajzolj karácsonyi képet!",
-            "🎅 Írj levelet a Mikulásnak!",
-            "🌟 Díszítsd fel a fát!",
-            "🎬 Nézz karácsonyi filmet!",
-            "💌 Küldj üdvözletet valakinek!",
-            "🧣 Öltözz melegen!",
-            "🎪 Játssz családi játékot!",
-            "🍊 Egyél mandarint!",
-            "🎺 Énekelj karácsonyi dalt!",
-            "🏔️ Menj sétálni a hóban!",
-            "🎀 Csomagolj ajándékot!",
-            "✨ Tervezz meg valamit az új évre!",
-            "🔔 Csengess!",
-            "🌲 Illatozz fenyőt!",
-            "🎉 Ünnepelj!",
-            "🎄 Boldog Karácsonyt! 🎁"
-        ];
+    // Hóesés indítása - CSAK hópelyhek, változó méret
+    function createSnowflake() {
+      const snowflake = document.createElement("div");
+      snowflake.className = "snowflake";
+      snowflake.innerHTML = "❄️";
 
-        // Hópelyhek létrehozása
-        function createSnowflakes() {
-            for (let i = 0; i < 50; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.classList.add('snowflake');
-                snowflake.innerHTML = '❄';
-                snowflake.style.left = Math.random() * 100 + '%';
-                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
-                snowflake.style.opacity = Math.random();
-                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
-                document.body.appendChild(snowflake);
-            }
+      // Változó méret (kis, közepes, nagy hópelyhek)
+      const merete = Math.random() * 25 + 15;  // 15-40px
+      snowflake.style.fontSize = merete + "px";
+
+      snowflake.style.left = Math.random() * 100 + "vw";
+      snowflake.style.animationDuration = (Math.random() * 3 + 3) + "s";  // 3-6s lassabb esés
+      snowflake.style.opacity = Math.random() * 0.5 + 0.3;  // áttetszőbb
+
+      document.body.appendChild(snowflake);
+
+      setTimeout(() => snowflake.remove(), 6000);
+    }
+    setInterval(createSnowflake, 150);  // sűrűbb hóesés
+
+
+    for (let nap = 1; nap <= 23; nap++) {
+      const cell = document.createElement("div");
+      cell.className = "day";
+      cell.dataset.day = nap;
+
+      const hetNapIndex = (nap - 1 + 1) % 7;
+      cell.innerHTML = `December ${nap}.<br><strong>${hetNapjai[hetNapIndex]}</strong>`;
+
+      cell.addEventListener("click", () => {
+        const currentDay = parseInt(cell.dataset.day);
+        if (currentDay === nextOpenableDay) {
+          cell.classList.add("opened");
+
+          const emojik = ["🎄", "❄️", "🎁", "⭐", "🔔", "🎅", "🦌", "☃️", "🎀", "✨"];
+          const randomEmoji = emojik[Math.floor(Math.random() * emojik.length)];
+          cell.innerHTML = `December ${nap}.<br><strong>${hetNapjai[hetNapIndex]}</strong><br><span class="emoji">${randomEmoji}</span>`;
+
+          nextOpenableDay++;
         }
+      });
 
-        // Naptár létrehozása
-        function createCalendar() {
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = ''; // Töröljük a meglévő tartalmat
-
-            for (let i = 1; i <= 24; i++) {
-                const dayBox = document.createElement('div');
-                dayBox.classList.add('day-box');
-                
-                // Ellenőrizzük, hogy már ki van-e nyitva
-                if (localStorage.getItem(`day-${i}`) === 'opened') {
-                    dayBox.classList.add('opened');
-                }
-
-                dayBox.innerHTML = `
-                    <div class="day-number">${i}</div>
-                    <div class="surprise">${surprises[i - 1]}</div>
-                `;
-
-                // MINDEN nap nyitható - eltávolítottuk az isLocked paramétert
-                dayBox.addEventListener('click', () => openDay(i, dayBox));
-                calendar.appendChild(dayBox);
-            }
-        }
-
-        // Nap megnyitása - egyszerűsített verzió
-        function openDay(day, element) {
-            if (!element.classList.contains('opened')) {
-                element.classList.add('opened');
-                localStorage.setItem(`day-${day}`, 'opened');
-                showModal(`🎁 ${day}. nap`, surprises[day - 1]);
-            }
-        }
-
-        // Modal megjelenítése
-        function showModal(title, message) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = message;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        // Modal bezárása
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        // Naptár visszaállítása - minden ajtó bezárása
-        function resetCalendar() {
-            if (confirm('Biztosan visszaállítod a naptárt? Minden megnyitott ajtó bezáródik!')) {
-                // Töröljük az összes mentett állapotot
-                for (let i = 1; i <= 24; i++) {
-                    localStorage.removeItem(`day-${i}`);
-                }
-                // Újra létrehozzuk a naptárt
-                createCalendar();
-            }
-        }
-
-        // Inicializálás
-        createSnowflakes();
-        createCalendar();
-    </script>
+      calendar.appendChild(cell);
+    }
+  </script>
 </body>
+
 </html>
